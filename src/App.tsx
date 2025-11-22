@@ -3,7 +3,7 @@ import { RAW_DATA } from './data';
 import { parseVocabulary, generateQuiz } from './utils';
 import { Word, AppView, QuizQuestion } from './types';
 
-// Icons - Updated to accept className prop for sizing
+// Icons
 const IconBook = ({ className = "w-5 h-5" }: { className?: string }) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>;
 const IconCheck = ({ className = "w-5 h-5" }: { className?: string }) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
 const IconList = ({ className = "w-5 h-5" }: { className?: string }) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>;
@@ -38,12 +38,10 @@ export default function App() {
   const [displayLimit, setDisplayLimit] = useState(50);
   const listContainerRef = useRef<HTMLDivElement>(null);
 
-  // Load Data
   useEffect(() => {
     setTimeout(() => {
       const parsed = parseVocabulary(RAW_DATA);
       setWords(parsed);
-      
       const savedProgress = localStorage.getItem('gaokao-learned');
       if (savedProgress) {
         setLearnedIds(new Set(JSON.parse(savedProgress)));
@@ -52,40 +50,28 @@ export default function App() {
     }, 100); 
   }, []);
 
-  // Filter Logic
   const getFilteredWords = (onlyLearned: boolean = false) => {
     let list = onlyLearned ? words.filter(w => learnedIds.has(w.id)) : words;
-    
     if (!searchTerm) return list;
-    
     const lowerTerm = searchTerm.toLowerCase();
     return list.filter(w => 
-      w.english.toLowerCase().includes(lowerTerm) || 
-      w.chinese.includes(lowerTerm)
+      w.english.toLowerCase().includes(lowerTerm) || w.chinese.includes(lowerTerm)
     );
   };
 
   const filteredWords = useMemo(() => getFilteredWords(view === 'learned'), [words, searchTerm, view, learnedIds]);
+  const visibleWords = useMemo(() => filteredWords.slice(0, displayLimit), [filteredWords, displayLimit]);
 
-  const visibleWords = useMemo(() => {
-    return filteredWords.slice(0, displayLimit);
-  }, [filteredWords, displayLimit]);
-
-  // Reset limit when view changes
   useEffect(() => {
     setDisplayLimit(50);
     setSearchTerm('');
-    if (listContainerRef.current) {
-      listContainerRef.current.scrollTop = 0;
-    }
+    if (listContainerRef.current) listContainerRef.current.scrollTop = 0;
   }, [view]);
 
   const handleListScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
     if (scrollTop + clientHeight >= scrollHeight - 100) {
-      if (displayLimit < filteredWords.length) {
-        setDisplayLimit(prev => prev + 50);
-      }
+      if (displayLimit < filteredWords.length) setDisplayLimit(prev => prev + 50);
     }
   };
 
@@ -96,7 +82,6 @@ export default function App() {
     localStorage.setItem('gaokao-learned', JSON.stringify(Array.from(newSet)));
   };
 
-  // Navigation Actions
   const startStudy = () => {
     const unlearned = words.filter(w => !learnedIds.has(w.id));
     const pool = unlearned.length > 0 ? unlearned : words;
@@ -120,11 +105,9 @@ export default function App() {
   const handleQuizAnswer = (index: number) => {
     if (selectedOption !== null) return;
     setSelectedOption(index);
-    
     if (index === quizQuestions[currentQuizIndex].correctIndex) {
       setQuizScore(prev => prev + 1);
     }
-
     setTimeout(() => {
       if (currentQuizIndex < quizQuestions.length - 1) {
         setCurrentQuizIndex(prev => prev + 1);
@@ -156,10 +139,7 @@ export default function App() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 text-primary">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
-          <p className="font-medium text-slate-600">Loading 3500 Words...</p>
-        </div>
+        <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -168,10 +148,7 @@ export default function App() {
   const studyProgress = studyQueue.length > 0 ? ((currentStudyIndex + 1) / studyQueue.length) * 100 : 0;
 
   return (
-    // Main Container
     <div className="h-[100dvh] bg-slate-50 text-slate-900 font-sans flex flex-col overflow-hidden">
-      
-      {/* Header */}
       <header className="bg-white shadow-sm shrink-0 z-30 relative">
         <div className="max-w-4xl mx-auto px-4 h-14 sm:h-16 flex items-center justify-between">
           <h1 className="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2">
@@ -179,24 +156,16 @@ export default function App() {
             Vocab Master
           </h1>
           {view !== 'dashboard' && (
-            <button 
-              onClick={() => setView('dashboard')}
-              className="text-sm text-slate-500 hover:text-indigo-600 transition-colors font-medium px-2 py-1 rounded-md hover:bg-slate-100"
-            >
-              Back Home
-            </button>
+            <button onClick={() => setView('dashboard')} className="text-sm text-slate-500 hover:text-indigo-600 transition-colors font-medium px-2 py-1 rounded-md hover:bg-slate-100">Back Home</button>
           )}
         </div>
       </header>
 
-      {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto relative w-full">
-        <div className={`max-w-4xl mx-auto min-h-full flex flex-col h-full box-border ${view === 'study' ? 'p-3 sm:p-4' : 'p-3 sm:p-4 pb-20 sm:pb-8'}`}>
+      <main className="flex-1 overflow-y-auto relative w-full bg-slate-50">
+        <div className={`max-w-4xl mx-auto min-h-full flex flex-col box-border ${view === 'study' ? 'p-3 sm:p-4' : 'p-3 sm:p-4 pb-20 sm:pb-8'}`}>
           
-          {/* DASHBOARD */}
           {view === 'dashboard' && (
             <div className="flex flex-col gap-4 sm:gap-6 animate-in fade-in duration-500">
-              {/* Progress Card */}
               <div className="bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-2xl p-5 sm:p-8 text-white shadow-lg shadow-indigo-200 relative overflow-hidden shrink-0">
                 <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white opacity-10 rounded-full blur-3xl"></div>
                 <div className="relative z-10 flex items-center justify-between">
@@ -217,7 +186,6 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Action Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-4">
                 <button onClick={startStudy} className="group bg-white hover:bg-indigo-50 border border-slate-200 hover:border-indigo-200 p-5 rounded-xl shadow-sm hover:shadow-md transition-all text-left flex flex-row sm:flex-col items-center sm:items-start gap-4 sm:gap-0">
                   <div className="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center sm:mb-3 shrink-0 group-hover:scale-110 transition-transform"><IconBook /></div>
@@ -239,11 +207,9 @@ export default function App() {
             </div>
           )}
 
-          {/* STUDY VIEW */}
           {view === 'study' && studyQueue.length > 0 && (
             <div className="h-full flex flex-col max-w-md mx-auto w-full animate-in slide-in-from-bottom-4 duration-500">
-              {/* Top Controls */}
-              <div className="shrink-0 mb-2">
+              <div className="shrink-0 mb-3">
                 <div className="flex justify-between items-center mb-2">
                   <button onClick={handleStudyPrev} disabled={currentStudyIndex === 0} className={`p-2 rounded-full hover:bg-slate-200 transition-colors ${currentStudyIndex === 0 ? 'opacity-30 cursor-not-allowed' : 'text-slate-600'}`}><IconArrowLeft /></button>
                   <div className="text-slate-400 text-sm font-medium tracking-wider">{currentStudyIndex + 1} / {studyQueue.length}</div>
@@ -252,7 +218,6 @@ export default function App() {
                 <div className="w-full bg-slate-200 rounded-full h-1.5"><div className="bg-indigo-500 h-1.5 rounded-full transition-all duration-300" style={{ width: `${studyProgress}%` }}></div></div>
               </div>
               
-              {/* Flashcard */}
               <div className="flex-1 w-full bg-white rounded-3xl shadow-xl border border-slate-100 relative overflow-hidden flex flex-col mb-3 cursor-pointer hover:shadow-2xl transition-all" onClick={() => setIsFlipped(!isFlipped)}>
                 <div className="absolute top-4 right-4 z-10">
                    {learnedIds.has(studyQueue[currentStudyIndex].id) ? (
@@ -261,8 +226,9 @@ export default function App() {
                       <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-bold shadow-sm"><IconClock className="w-3 h-3" /> Reviewing</span>
                    )}
                 </div>
+                {/* 修复：让单词位置固定，不随内容居中而跳动 */}
                 <div className="absolute inset-0 flex flex-col text-center overflow-y-auto no-scrollbar">
-                  <div className="pt-24 sm:pt-32 px-6 shrink-0 flex flex-col items-center">
+                  <div className="pt-20 sm:pt-32 px-6 shrink-0 flex flex-col items-center">
                     <h2 className="text-3xl sm:text-5xl font-bold text-slate-900 mb-2 sm:mb-4 break-words">{studyQueue[currentStudyIndex].english}</h2>
                     <p className="text-lg sm:text-xl text-indigo-500 font-mono">{studyQueue[currentStudyIndex].phonetic}</p>
                   </div>
@@ -276,15 +242,14 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Bottom Actions */}
-              <div className="flex gap-3 sm:gap-4 shrink-0 pb-1 sm:pb-0">
+              {/* 修复：按钮贴底 */}
+              <div className="flex gap-3 sm:gap-4 shrink-0 mt-auto pb-2 sm:pb-0">
                 <button onClick={handleStudyNext} className="flex-1 py-3.5 sm:py-4 rounded-xl font-bold bg-white border-2 border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-all text-sm sm:text-base">Review Later</button>
                 <button onClick={() => { markAsLearned(studyQueue[currentStudyIndex].id); handleStudyNext({ stopPropagation: () => {} } as any); }} className="flex-1 py-3.5 sm:py-4 rounded-xl font-bold bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-200 hover:shadow-indigo-300 transition-all active:scale-95 text-sm sm:text-base">Mastered!</button>
               </div>
             </div>
           )}
 
-          {/* QUIZ VIEW */}
           {view === 'quiz' && quizQuestions.length > 0 && (
             <div className="max-w-lg mx-auto h-full flex flex-col">
               {!quizFinished ? (
@@ -334,7 +299,6 @@ export default function App() {
             </div>
           )}
 
-          {/* LIST VIEWS */}
           {(view === 'list' || view === 'learned') && (
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-full animate-in fade-in duration-300">
               <div className="p-4 border-b border-slate-100 bg-white sticky top-0 z-20 space-y-3">
@@ -372,7 +336,6 @@ export default function App() {
         </div>
       </main>
 
-      {/* Mobile Navigation Bar */}
       <div className="bg-white border-t border-slate-200 flex justify-around p-1 pb-safe sm:hidden z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] shrink-0 h-16">
         <button onClick={() => setView('dashboard')} className={`flex-1 flex flex-col items-center justify-center p-1 rounded-lg transition-colors ${view === 'dashboard' ? 'text-indigo-600' : 'text-slate-400 hover:bg-slate-50'}`}><IconHome /><span className="text-[10px] font-medium mt-1">Home</span></button>
         <button onClick={startStudy} className={`flex-1 flex flex-col items-center justify-center p-1 rounded-lg transition-colors ${view === 'study' ? 'text-indigo-600' : 'text-slate-400 hover:bg-slate-50'}`}><IconBook /><span className="text-[10px] font-medium mt-1">Study</span></button>
