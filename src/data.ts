@@ -1,4 +1,3 @@
-
 import { DATA_PART_1 } from './data_chunk1';
 import { DATA_PART_2 } from './data_chunk2';
 import { DATA_PART_3 } from './data_chunk3';
