@@ -42,7 +42,7 @@
 
 1.  **克隆项目**
     ```bash
-    git clone https://github.com/你的用户名/gaokao-vocab.git
+    git clone https://github.com/Jimmy-xuzimo/gaokao-vocab.git
     cd gaokao-vocab
     ```
 
