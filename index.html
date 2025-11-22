@@ -29,21 +29,7 @@
         font-family: 'Inter', system-ui, sans-serif;
         -webkit-font-smoothing: antialiased;
       }
-      /* Custom Scrollbar */
-      ::-webkit-scrollbar {
-        width: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #f1f5f9; 
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #cbd5e1; 
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #94a3b8; 
-      }
-      /* Utility for hiding scrollbar but allowing scroll */
+      /* 隐藏滚动条但允许滚动 */
       .no-scrollbar::-webkit-scrollbar {
         display: none;
       }
@@ -51,7 +37,7 @@
         -ms-overflow-style: none;
         scrollbar-width: none;
       }
-      /* iOS safe area fix */
+      /* 适配 iOS 底部安全区 */
       .pb-safe {
         padding-bottom: env(safe-area-inset-bottom);
       }
