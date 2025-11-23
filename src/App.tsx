@@ -14,6 +14,7 @@ const IconTrophy = ({ className = "w-5 h-5" }: { className?: string }) => <svg c
 const IconArrowLeft = ({ className = "w-6 h-6" }: { className?: string }) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>;
 const IconArrowRight = ({ className = "w-6 h-6" }: { className?: string }) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>;
 const IconClock = ({ className = "w-5 h-5" }: { className?: string }) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
+const IconTrash = ({ className = "w-5 h-5" }: { className?: string }) => <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>;
 
 export default function App() {
   const [words, setWords] = useState<Word[]>([]);
@@ -96,6 +97,13 @@ export default function App() {
     localStorage.setItem('gaokao-learned', JSON.stringify(Array.from(newSet)));
   };
 
+  const resetProgress = () => {
+    if (window.confirm('确定要清空所有背诵进度吗？此操作无法撤销。\nAre you sure you want to reset all progress?')) {
+      localStorage.removeItem('gaokao-learned');
+      setLearnedIds(new Set());
+    }
+  };
+
   // Navigation Actions
   const startStudy = () => {
     const unlearned = words.filter(w => !learnedIds.has(w.id));
@@ -168,7 +176,7 @@ export default function App() {
   const studyProgress = studyQueue.length > 0 ? ((currentStudyIndex + 1) / studyQueue.length) * 100 : 0;
 
   return (
-    // Main Container
+    // Main Container: Use flex column to manage full height properly on mobile
     <div className="h-[100dvh] bg-slate-50 text-slate-900 font-sans flex flex-col overflow-hidden">
       
       {/* Header */}
@@ -189,7 +197,7 @@ export default function App() {
         </div>
       </header>
 
-      {/* Main Content Area */}
+      {/* Main Content Area: Scrollable */}
       <main className="flex-1 overflow-y-auto relative w-full">
         <div className={`max-w-4xl mx-auto min-h-full flex flex-col box-border ${view === 'study' ? 'p-3 sm:p-4' : 'p-3 sm:p-4 pb-20 sm:pb-8'}`}>
           
@@ -211,29 +219,80 @@ export default function App() {
                     </div>
                     <p className="mt-2 text-xs sm:text-sm text-indigo-100">{progress}% Completed</p>
                   </div>
+                  {/* Circular Progress for larger screens */}
                   <div className="hidden sm:flex w-24 h-24 rounded-full border-4 border-indigo-400 items-center justify-center shrink-0 ml-4">
                     <span className="text-2xl font-bold">{progress}%</span>
                   </div>
                 </div>
               </div>
 
-              {/* Action Grid */}
+              {/* Action Grid: Adaptive Columns */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-4">
-                <button onClick={startStudy} className="group bg-white hover:bg-indigo-50 border border-slate-200 hover:border-indigo-200 p-5 rounded-xl shadow-sm hover:shadow-md transition-all text-left flex flex-row sm:flex-col items-center sm:items-start gap-4 sm:gap-0">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center sm:mb-3 shrink-0 group-hover:scale-110 transition-transform"><IconBook /></div>
-                  <div><h3 className="text-base sm:text-lg font-bold text-slate-800">Start Learning</h3><p className="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">Flashcards for new words.</p></div>
+                {/* Study Button */}
+                <button 
+                  onClick={startStudy}
+                  className="group bg-white hover:bg-indigo-50 border border-slate-200 hover:border-indigo-200 p-5 rounded-xl shadow-sm hover:shadow-md transition-all text-left flex flex-row sm:flex-col items-center sm:items-start gap-4 sm:gap-0"
+                >
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center sm:mb-3 shrink-0 group-hover:scale-110 transition-transform">
+                    <IconBook />
+                  </div>
+                  <div>
+                    <h3 className="text-base sm:text-lg font-bold text-slate-800">Start Learning</h3>
+                    <p className="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">Flashcards for new words.</p>
+                  </div>
                 </button>
-                <button onClick={startQuiz} className="group bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-200 p-5 rounded-xl shadow-sm hover:shadow-md transition-all text-left flex flex-row sm:flex-col items-center sm:items-start gap-4 sm:gap-0">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center sm:mb-3 shrink-0 group-hover:scale-110 transition-transform"><IconCheck /></div>
-                  <div><h3 className="text-base sm:text-lg font-bold text-slate-800">Daily Quiz</h3><p className="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">Test your knowledge.</p></div>
+
+                {/* Quiz Button */}
+                <button 
+                  onClick={startQuiz}
+                  className="group bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-200 p-5 rounded-xl shadow-sm hover:shadow-md transition-all text-left flex flex-row sm:flex-col items-center sm:items-start gap-4 sm:gap-0"
+                >
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center sm:mb-3 shrink-0 group-hover:scale-110 transition-transform">
+                    <IconCheck />
+                  </div>
+                  <div>
+                    <h3 className="text-base sm:text-lg font-bold text-slate-800">Daily Quiz</h3>
+                    <p className="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">Test your knowledge.</p>
+                  </div>
                 </button>
-                <button onClick={() => setView('learned')} className="group bg-white hover:bg-amber-50 border border-slate-200 hover:border-amber-200 p-5 rounded-xl shadow-sm hover:shadow-md transition-all text-left flex flex-row sm:flex-col items-center sm:items-start gap-4 sm:gap-0">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center sm:mb-3 shrink-0 group-hover:scale-110 transition-transform"><IconTrophy /></div>
-                  <div><h3 className="text-base sm:text-lg font-bold text-slate-800">Mastered Words</h3><p className="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">Review what you know.</p></div>
+
+                {/* Learned Words Button */}
+                <button 
+                  onClick={() => setView('learned')}
+                  className="group bg-white hover:bg-amber-50 border border-slate-200 hover:border-amber-200 p-5 rounded-xl shadow-sm hover:shadow-md transition-all text-left flex flex-row sm:flex-col items-center sm:items-start gap-4 sm:gap-0"
+                >
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center sm:mb-3 shrink-0 group-hover:scale-110 transition-transform">
+                    <IconTrophy />
+                  </div>
+                  <div>
+                    <h3 className="text-base sm:text-lg font-bold text-slate-800">Mastered Words</h3>
+                    <p className="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">Review what you know.</p>
+                  </div>
                 </button>
-                <button onClick={() => setView('list')} className="group bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-200 p-5 rounded-xl shadow-sm hover:shadow-md transition-all text-left flex flex-row sm:flex-col items-center sm:items-start gap-4 sm:gap-0">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center sm:mb-3 shrink-0 group-hover:scale-110 transition-transform"><IconList /></div>
-                  <div><h3 className="text-base sm:text-lg font-bold text-slate-800">Full Dictionary</h3><p className="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">Browse all 3500 words.</p></div>
+
+                {/* Full Dictionary Button */}
+                <button 
+                  onClick={() => setView('list')}
+                  className="group bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-200 p-5 rounded-xl shadow-sm hover:shadow-md transition-all text-left flex flex-row sm:flex-col items-center sm:items-start gap-4 sm:gap-0"
+                >
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center sm:mb-3 shrink-0 group-hover:scale-110 transition-transform">
+                    <IconList />
+                  </div>
+                  <div>
+                    <h3 className="text-base sm:text-lg font-bold text-slate-800">Full Dictionary</h3>
+                    <p className="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">Browse all 3500 words.</p>
+                  </div>
+                </button>
+              </div>
+
+              {/* Reset Button */}
+              <div className="mt-4 flex justify-center">
+                <button 
+                  onClick={resetProgress}
+                  className="text-xs text-slate-400 hover:text-red-500 transition-colors flex items-center gap-1"
+                >
+                  <IconTrash className="w-3 h-3" />
+                  Reset Progress (清空进度)
                 </button>
               </div>
             </div>
@@ -346,6 +405,7 @@ export default function App() {
                     <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 mb-3">{quizQuestions[currentQuizIndex].word.english}</h2>
                     <p className="text-slate-400 font-mono text-lg">{quizQuestions[currentQuizIndex].word.phonetic}</p>
                     
+                    {/* Feedback Message Area */}
                     <div className="h-8 mt-4 flex items-center justify-center">
                       <div className={`transition-all duration-300 ${selectedOption !== null ? 'opacity-100 transform scale-100' : 'opacity-0 transform scale-90'}`}>
                         {selectedOption !== null && (
@@ -377,10 +437,13 @@ export default function App() {
                         btnClass += "bg-white border-slate-200 hover:border-indigo-400 hover:bg-indigo-50 text-slate-700 shadow-sm";
                       } else {
                         if (idx === quizQuestions[currentQuizIndex].correctIndex) {
+                          // Correct answer styling - Removed scale/ring to keep size consistent
                           btnClass += "bg-emerald-100 border-emerald-500 text-emerald-800 shadow-sm";
                         } else if (idx === selectedOption) {
+                          // Incorrect answer selected
                           btnClass += "bg-rose-100 border-rose-500 text-rose-800";
                         } else {
+                          // Unselected options
                           btnClass += "bg-slate-50 border-slate-100 text-slate-400 opacity-50";
                         }
                       }
