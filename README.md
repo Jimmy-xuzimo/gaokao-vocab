@@ -6,6 +6,7 @@
 ![React](https://img.shields.io/badge/React-18-61DAFB.svg)
 ![Vite](https://img.shields.io/badge/Vite-4.0-646CFF.svg)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6.svg)
+<img width="4400" height="2722" alt="image" src="https://github.com/user-attachments/assets/4cce53f7-beb6-49bc-9773-6f902bae4486" />
 
 ## ✨ 功能特性 (Features)
 
