@@ -30,13 +30,13 @@ export function useDebounce<T>(value: T, delay: number): T {
  * @param delay - 延迟时间（毫秒）
  * @returns 防抖后的回调函数
  */
-export function useDebouncedCallback<T extends (...args: unknown[]) => unknown>(
+export function useDebouncedCallback<T extends (...args: any[]) => any>(
   callback: T,
   delay: number
-): (...args: Parameters<T>) => void {
+): T {
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  return (...args: Parameters<T>) => {
+  return ((...args: Parameters<T>) => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
@@ -44,5 +44,5 @@ export function useDebouncedCallback<T extends (...args: unknown[]) => unknown>(
     timeoutRef.current = setTimeout(() => {
       callback(...args);
     }, delay);
-  };
+  }) as T;
 }

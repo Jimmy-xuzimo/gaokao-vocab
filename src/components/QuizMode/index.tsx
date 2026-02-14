@@ -24,7 +24,7 @@ export const QuizMode: React.FC<QuizModeProps> = ({
   const [isFinished, setIsFinished] = useState(false);
   
   // 使用ref存储定时器，避免闭包问题
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const currentQuestion = questions[currentIndex];
 
