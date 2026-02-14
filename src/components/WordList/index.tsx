@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { Word } from '../../types';
 import { IconSearch, IconCheck } from '../Icons';
-import { useDebounce } from '../../hooks';
+import { useDebounce, useDebouncedCallback } from '../../hooks';
 
 interface WordListProps {
   words: Word[];
@@ -56,8 +56,8 @@ export const WordList: React.FC<WordListProps> = ({
     }, 100);
   }, [isLoading, hasMore, filteredWords.length]);
 
-  // 优化的滚动处理函数
-  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+  // 使用防抖优化滚动处理函数，避免频繁触发
+  const handleScroll = useDebouncedCallback((e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
     const scrollBottom = scrollTop + clientHeight;
     // 当滚动到距离底部 100px 时触发加载
@@ -66,7 +66,7 @@ export const WordList: React.FC<WordListProps> = ({
     if (scrollBottom >= threshold) {
       loadMore();
     }
-  }, [loadMore]);
+  }, 100);
 
   // 搜索词变化时重置
   useEffect(() => {

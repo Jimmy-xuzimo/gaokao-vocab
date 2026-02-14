@@ -112,7 +112,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-bold text-slate-800">Full Dictionary</h3>
-                <p className="text-sm text-slate-500 mt-1">Browse all 3500 words</p>
+                <p className="text-sm text-slate-500 mt-1">Browse all {words.length} words</p>
               </div>
             </button>
           </div>

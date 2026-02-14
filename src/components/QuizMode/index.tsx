@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { QuizQuestion } from '../../types';
 import { IconCheck, IconXCircle } from '../Icons';
 import { getScoreRating } from '../../utils/quiz';
@@ -22,6 +22,9 @@ export const QuizMode: React.FC<QuizModeProps> = ({
   const [score, setScore] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [isFinished, setIsFinished] = useState(false);
+  
+  // 使用ref存储定时器，避免闭包问题
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const currentQuestion = questions[currentIndex];
 
@@ -33,8 +36,13 @@ export const QuizMode: React.FC<QuizModeProps> = ({
     if (index === currentQuestion.correctIndex) {
       setScore(prev => prev + 1);
     }
+  }, [currentQuestion.correctIndex, selectedOption]);
 
-    setTimeout(() => {
+  // 使用useEffect处理答案后的延迟跳转，确保正确清理定时器
+  useEffect(() => {
+    if (selectedOption === null) return;
+
+    timerRef.current = setTimeout(() => {
       if (currentIndex < questions.length - 1) {
         setCurrentIndex(prev => prev + 1);
         setSelectedOption(null);
@@ -42,7 +50,15 @@ export const QuizMode: React.FC<QuizModeProps> = ({
         setIsFinished(true);
       }
     }, 1500);
-  }, [currentIndex, currentQuestion.correctIndex, questions.length, selectedOption]);
+
+    // 清理函数：组件卸载或依赖变化时清除定时器
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [selectedOption, currentIndex, questions.length]);
 
   if (isFinished) {
     const rating = getScoreRating(score, questions.length);
