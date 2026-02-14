@@ -9,12 +9,12 @@
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-06B6D4.svg)
 ![Tests](https://img.shields.io/badge/tests-35%20passed-brightgreen.svg)
 
-<img width="4400" height="2722" alt="image" src="https://github.com/user-attachments/assets/4cce53f7-beb6-49bc-9773-6f902bae4486" />
+<img width="4400" height="2724" alt="image" src="https://github.com/user-attachments/assets/c7b86405-a5a8-4031-aa6f-176c54588804" />
 
 ## ✨ 功能特性 (Features)
 
 ### 📚 完整词库
-- 收录高考英语大纲 **3817 个单词**，超出标准 3500 词
+- 收录高考英语大纲 **3817 个单词**
 - 每个单词包含：音标、词性、详细中文释义
 - 支持英文单词和中文释义双向搜索
 
@@ -133,23 +133,6 @@ src/
 | `npm run lint` | 运行 ESLint 检查 |
 | `npm run typecheck` | 运行 TypeScript 类型检查 |
 
-## ☁️ 部署 (Deployment)
-
-### Vercel（推荐）
-
-1. 将代码上传至 GitHub
-2. 登录 [Vercel](https://vercel.com/)，点击 "Add New Project"
-3. 导入你的 GitHub 仓库
-4. Framework Preset 选择 "Vite"
-5. 点击 **Deploy**，等待约 1 分钟即可获得在线访问链接
-
-### 其他平台
-
-本项目构建输出为纯静态文件，可部署到任何静态托管服务：
-- GitHub Pages
-- Netlify
-- Cloudflare Pages
-- AWS S3 + CloudFront
 
 ## 🧪 测试
 
