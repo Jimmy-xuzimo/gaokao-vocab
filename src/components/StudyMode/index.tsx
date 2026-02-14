@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { Word } from '../../types';
 import { IconArrowLeft, IconArrowRight, IconCheck, IconClock, IconBookOpen } from '../Icons';
 
@@ -21,18 +21,23 @@ export const StudyMode: React.FC<StudyModeProps> = ({
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
+  
+  // 使用 ref 防止快速点击导致的重复操作
+  const isProcessingRef = useRef(false);
 
   const currentWord = studyQueue[currentIndex];
   const progress = studyQueue.length > 0 ? ((currentIndex + 1) / studyQueue.length) * 100 : 0;
 
   const handlePrev = useCallback(() => {
-    if (currentIndex > 0) {
+    if (currentIndex > 0 && !isProcessingRef.current) {
       setIsFlipped(false);
       setTimeout(() => setCurrentIndex(prev => prev - 1), 150);
     }
   }, [currentIndex]);
 
   const handleNext = useCallback(() => {
+    if (isProcessingRef.current) return;
+    
     if (currentIndex < studyQueue.length - 1) {
       setIsFlipped(false);
       setTimeout(() => setCurrentIndex(prev => prev + 1), 150);
@@ -42,8 +47,21 @@ export const StudyMode: React.FC<StudyModeProps> = ({
   }, [currentIndex, studyQueue.length, onGoHome]);
 
   const handleMarkLearned = useCallback(() => {
+    // 防止快速重复点击
+    if (isProcessingRef.current) return;
+    
+    isProcessingRef.current = true;
+    
+    // 标记为已学习
     onMarkAsLearned(currentWord.id);
+    
+    // 跳转到下一个
     handleNext();
+    
+    // 300ms 后重置处理状态，允许下一次操作
+    setTimeout(() => {
+      isProcessingRef.current = false;
+    }, 300);
   }, [currentWord.id, onMarkAsLearned, handleNext]);
 
   // 空状态 - 优化设计
