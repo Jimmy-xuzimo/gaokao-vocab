@@ -96,11 +96,11 @@ export const WordList: React.FC<WordListProps> = ({
   }, [visibleWords.length, hasMore, isLoading, loadMore]);
 
   return (
-    <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-full animate-fade-in">
+    <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-full animate-fade-in w-full max-w-full">
       {/* Header */}
-      <div className="p-4 border-b border-slate-100 bg-white sticky top-0 z-20 space-y-3">
+      <div className="p-3 sm:p-4 border-b border-slate-100 bg-white sticky top-0 z-20 space-y-2 sm:space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="font-bold text-lg text-slate-800">{title}</h2>
+          <h2 className="font-bold text-base sm:text-lg text-slate-800">{title}</h2>
           <span className="text-xs font-medium bg-slate-100 px-2 py-1 rounded text-slate-500">
             {filteredWords.length} words
           </span>
@@ -112,7 +112,7 @@ export const WordList: React.FC<WordListProps> = ({
           <input 
             type="text" 
             placeholder="Search words..." 
-            className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-slate-50 border border-slate-200 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all duration-200 text-sm"
+            className="w-full pl-10 pr-4 py-2 sm:py-2.5 rounded-lg bg-slate-50 border border-slate-200 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all duration-200 text-sm"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -123,7 +123,7 @@ export const WordList: React.FC<WordListProps> = ({
       <div 
         ref={listContainerRef}
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto min-h-0"
+        className="flex-1 overflow-y-auto overflow-x-hidden min-h-0"
       >
         <div className="divide-y divide-slate-50">
           {visibleWords.map((word) => {
@@ -132,27 +132,27 @@ export const WordList: React.FC<WordListProps> = ({
             return (
               <div 
                 key={word.id}
-                className="p-4 hover:bg-slate-50 flex items-center justify-between group transition-colors duration-200"
+                className="p-3 sm:p-4 hover:bg-slate-50 flex items-start justify-between gap-2 sm:gap-4 group transition-colors duration-200"
               >
-                <div className="flex-1 pr-4 min-w-0">
-                  <div className="flex items-baseline gap-2">
-                    <span className="font-bold text-slate-800 text-lg truncate">{word.english}</span>
+                <div className="flex-1 min-w-0 overflow-hidden">
+                  <div className="flex items-baseline gap-1.5 sm:gap-2 flex-wrap">
+                    <span className="font-bold text-slate-800 text-base sm:text-lg break-all">{word.english}</span>
                     <span className="font-mono text-slate-400 text-xs sm:text-sm shrink-0">{word.phonetic}</span>
                   </div>
-                  <div className="text-sm text-slate-600 mt-1 line-clamp-2 leading-relaxed">{word.chinese}</div>
+                  <div className="text-sm text-slate-600 mt-1 leading-relaxed break-words">{word.chinese}</div>
                 </div>
                 {isLearned ? (
                   <div className="shrink-0 flex flex-col items-center gap-1">
-                    <span className="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center">
+                    <span className="w-7 h-7 sm:w-8 sm:h-8 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center">
                       <IconCheck />
                     </span>
-                    <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wide">Mastered</span>
+                    <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wide hidden sm:block">Mastered</span>
                   </div>
                 ) : (
                   showMarkButton && (
                     <button 
                       onClick={() => onMarkAsLearned(word.id)}
-                      className="shrink-0 w-8 h-8 text-slate-300 hover:text-indigo-500 hover:bg-indigo-50 rounded-full flex items-center justify-center transition-all duration-200"
+                      className="shrink-0 w-7 h-7 sm:w-8 sm:h-8 text-slate-300 hover:text-indigo-500 hover:bg-indigo-50 rounded-full flex items-center justify-center transition-all duration-200"
                       title="Mark as learned"
                     >
                       <IconCheck />

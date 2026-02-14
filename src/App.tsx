@@ -226,8 +226,8 @@ export default function App() {
           </header>
 
           {/* Main Content Area - 居中对齐 */}
-          <main className="flex-1 relative w-full overflow-y-auto pb-20 md:pb-0">
-            <div className="max-w-6xl mx-auto min-h-full flex flex-col justify-center box-border p-4 sm:p-6 lg:p-8">
+          <main className="flex-1 relative w-full overflow-y-auto overflow-x-hidden pb-20 md:pb-0">
+            <div className="max-w-6xl mx-auto min-h-full flex flex-col justify-center box-border p-3 sm:p-4 lg:p-6">
               
               {/* DASHBOARD */}
               {view === 'dashboard' && (
