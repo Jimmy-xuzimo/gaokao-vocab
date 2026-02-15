@@ -25,6 +25,9 @@ jobs:
     - name: Build web assets
       run: npm run build
       
+    - name: Sync Capacitor
+      run: npx cap sync android
+      
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
