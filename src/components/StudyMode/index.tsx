@@ -35,9 +35,8 @@ export const StudyMode: React.FC<StudyModeProps> = ({
     }
   }, [currentIndex]);
 
-  const handleNext = useCallback(() => {
-    if (isProcessingRef.current) return;
-    
+  // 切换到下一个单词的内部逻辑
+  const goToNext = useCallback(() => {
     if (currentIndex < studyQueue.length - 1) {
       setIsFlipped(false);
       setTimeout(() => setCurrentIndex(prev => prev + 1), 150);
@@ -45,6 +44,11 @@ export const StudyMode: React.FC<StudyModeProps> = ({
       onGoHome();
     }
   }, [currentIndex, studyQueue.length, onGoHome]);
+
+  const handleNext = useCallback(() => {
+    if (isProcessingRef.current) return;
+    goToNext();
+  }, [goToNext]);
 
   const handleMarkLearned = useCallback(() => {
     // 防止快速重复点击
@@ -55,14 +59,14 @@ export const StudyMode: React.FC<StudyModeProps> = ({
     // 标记为已学习
     onMarkAsLearned(currentWord.id);
     
-    // 跳转到下一个
-    handleNext();
+    // 跳转到下一个（使用内部逻辑，不检查isProcessingRef）
+    goToNext();
     
     // 300ms 后重置处理状态，允许下一次操作
     setTimeout(() => {
       isProcessingRef.current = false;
     }, 300);
-  }, [currentWord.id, onMarkAsLearned, handleNext]);
+  }, [currentWord.id, onMarkAsLearned, goToNext]);
 
   // 空状态 - 优化设计
   if (!currentWord) {
