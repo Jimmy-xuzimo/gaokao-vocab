@@ -1,7 +1,7 @@
 module.exports = {
   apps: [{
     name: 'gaokao-vocab',
-    script: 'npm',
+    script: '/usr/bin/npm',
     args: 'run preview -- --port 28001 --host 127.0.0.1',
     cwd: '/volume1/gaokao-vocab',
     instances: 1,
@@ -9,7 +9,8 @@ module.exports = {
     watch: false,
     max_memory_restart: '500M',
     env: {
-      NODE_ENV: 'production'
+      NODE_ENV: 'production',
+      PATH: '/usr/bin:/usr/local/bin:/bin:/usr/sbin:/sbin'
     },
     error_file: '/volume1/gaokao-vocab/logs/err.log',
     out_file: '/volume1/gaokao-vocab/logs/out.log',
